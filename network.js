@@ -1,5 +1,5 @@
-var width = 960;
-var height = 500;
+var width = 1280;
+var height = 700;
 
 var svg = d3.select('body').append('svg')
   .attr('width', width)
@@ -32,7 +32,7 @@ d3.json('/reddit/top_subreddits.json', function(json) {
 
   // fill in node 'g' with a circle
   node.append('circle')
-    .attr('r', function(d) { return d.size; } );
+    .attr('r', function(d) { return 10; } );
 
   node.append('text')
     .attr("dx", 12)

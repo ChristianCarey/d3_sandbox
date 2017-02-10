@@ -99,11 +99,6 @@ var array = [ { AskReddit: 15652682, id: 0 },
   { DIY: 10707616, id: 98 },
   { ukpolitics: 70148, id: 99 } ]
 
-for (var i = 0; i < array.length; i++) {
-  var sub = array[i];
-
-}
-
 var makeChildren = function(root, array, graph, depth) {
   console.log('wat')
   if(!array.length) { 
@@ -136,5 +131,3 @@ var makeChildren = function(root, array, graph, depth) {
 
 var root = array.shift()
 var graph = makeChildren(root, array)
-
-console.log(graph)

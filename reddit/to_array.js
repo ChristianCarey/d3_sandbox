@@ -5,7 +5,6 @@ var array = [];
 var id = 0;
 
 for (name in obj) {
-  console.log(name)
   var new_obj = {}
   new_obj['name'] = name
   new_obj['size'] = obj[name]
@@ -14,4 +13,34 @@ for (name in obj) {
   id++;
 }
 
-console.log(array)
+console.log(JSON.stringify(array))
+// var makeChildren = function(root, array, graph, depth) {
+//   if(!array.length) { 
+//     return graph; 
+//   }
+//   graph = graph || [];
+//   depth = depth || 1;
+//   var children = [];
+//   for (var i = 0; i < 5; i++) {
+//     if (!array.length) {
+//       // console.log(JSON.stringify(graph))
+//       return graph;
+//     }
+//     var child = array.shift();
+//     children.push(child);
+//     graph.push({
+//       source: root.id,
+//       target: child.id,
+//       weight: 1  
+//     })
+//   }
+
+//   if (depth < 4) {
+//     children.forEach(function(child) {
+//       makeChildren(child, array, graph, depth + 1);
+//     })
+//   }
+// }
+
+// var root = array.shift()
+// var graph = makeChildren(root, array)

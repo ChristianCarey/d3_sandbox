@@ -11,7 +11,7 @@ var force = d3.layout.force()
   .charge(-500) // repellant
   .size([width, height]);
 
-d3.json('data.json', function(json) {
+d3.json('/reddit/top_subreddits.json', function(json) {
   // set up force network
   // adding force behavior to the nodes
   force.nodes(json.nodes).links(json.links).start();

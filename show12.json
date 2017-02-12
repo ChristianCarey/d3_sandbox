@@ -1,0 +1,38 @@
+{
+  "id" : 12,
+  "name" : "politics",
+  "numSubscribers" : 3293964,
+  "activeUsers" : 93964,
+  "children" : [
+    {
+      "id" : 6,
+      "name" : "The_Donald",
+      "numSubscribers" : 364364,
+      "activeUsers" : 4364
+    },
+    {
+      "id" : 7,
+      "name" : "news",
+      "numSubscribers" : 12766077,
+      "activeUsers" : 766077
+    },
+    {
+      "id" : 8,
+      "name" : "PoliticalDiscussion",
+      "numSubscribers" : 124107,
+      "activeUsers" : 4107
+    },
+    {
+      "id" : 9,
+      "name" : "ukpolitics",
+      "numSubscribers" : 70148,
+      "activeUsers" : 148
+    },
+    {
+      "id" : 10,
+      "name" : "trees",
+      "numSubscribers" : 917788,
+      "activeUsers" : 7788
+    }
+  ]
+}

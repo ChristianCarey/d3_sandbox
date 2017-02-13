@@ -1,6 +1,7 @@
-// Set height and width of svg canvas, hoist root (center of graph).
+// Set height and width of svg canvas, hoist nodes and root (center of graph).
 var width = 1200,
     height = 600,
+    nodes,
     root;
 
 // Find the body, append a new svg element, and set its width and height.
@@ -19,7 +20,7 @@ var force = d3.layout.force()
   // Gravitational force at center of the canvas (0.0 - 1.0).
   .gravity(.05)
   // Sets the size of the force layout, which is used to determine the center of gravity and the bounds within which nodes initally appear. Here it is equal to our svg canvas size.
-  .size([width, height]);
+  .size([width, height])
 
 // We will scale the radius of each circle with a linear slope within a specified range.
 var rScale = d3.scale.linear().range([5, 15]);
@@ -41,9 +42,9 @@ d3.json("show1.json", function(error, json) {
 
 var update = function update() {
   // Put all nodes into a flat array (see flatten() implementation below).
-  var nodes = flatten(root),
-      // And create links between them (nodes must have a property called 'children').
-      links = d3.layout.tree().links(nodes);
+  nodes = flatten(root),
+    // And create links between them (nodes must have a property called 'children').
+    links = d3.layout.tree().links(nodes);
 
   // Feed the force layout current nodes and links.
   force
@@ -72,7 +73,6 @@ var update = function update() {
   link.enter().insert('line', '.node')
     // Add the class '.link' so that they are bound to our 'links' data.
     .attr('class', 'link')
-
   // Same as above, but now binding data to '.node' DOM elements.
   node = node.data(nodes, function(d) { return d.id })
   // Same as above again, but removing extra '.node' elements.
@@ -105,6 +105,14 @@ var update = function update() {
 
 // Called repeatedly as long as nodes/links are moving.
 var tick = function tick() {
+  // Sort our nodes into a quadtree (https://github.com/d3/d3-3.x-api-reference/blob/master/Quadtree-Geom.md)
+  var qTree = d3.geom.quadtree(nodes);
+  
+  nodes.forEach(function(node) {
+    // Run every node in the quadtree through the callback returned by collide(node).
+    qTree.visit(collide(node))
+  })
+
   // Redraw lines so that their endpoints are at their nodes' centers.
   link.attr('x1', function(d) { return d.source.x; })
       .attr('y1', function(d) { return d.source.y; })
@@ -116,9 +124,10 @@ var tick = function tick() {
 }
 
 var expand = function expand(d) {
-  // ignore drag?
+  // Return if node is being dragged.
   if(d3.event.defaultPrevented) return;
-
+  lastX = d.x;
+  lastY = d.y;
   // If expanded...
   if(d.children) {
     // Hide children in _children.
@@ -157,4 +166,44 @@ var flatten = function flatten(root) {
   // Starting with the root
   recurse(root);
   return nodes
+}
+
+var collide = function collide(dataNode) {
+  // Define the bounds of the given node.
+  var radius = rScale(dataNode.numSubscribers),
+      dataX1 = dataNode.x - radius,
+      dataX2 = dataNode.x + radius,
+      dataY1 = dataNode.y - radius,
+      dataY2 = dataNode.y + radius;
+  // This callback takes the node of the quadtree and its bounds. 
+  return function(quad, treeX1, treeY1, treeX2, treeY2) {
+    var treeNode = quad.point;
+    if (treeNode && (treeNode.id !== dataNode.id)) {
+      // Calculate the distance between the two nodes.
+      var x = dataNode.x - treeNode.x,
+          y = dataNode.y - treeNode.y,
+          // Pythagoras!
+          distance = Math.sqrt(x * x + y * y),
+          // Add radii together to find the minimum distance apart the nodes can be without colliding.
+          min = radius + rScale(treeNode.numSubscribers);
+          
+      // If nodes collide...
+      if (distance < min) {
+        // Find the amount of overlap and adjust each node half that distance.
+        var adjustment = (distance - min) / distance * .5;
+        var xAdjustment = x * adjustment;
+        var yAdjustment = x * adjustment;
+        dataNode.x -= xAdjustment;
+        dataNode.y -= yAdjustment;
+        treeNode.x += xAdjustment;
+        treeNode.y += yAdjustment;
+      }
+    }
+    
+    // Return true if no part of the dataNode is inside of the treeNode. If this callback returns true, none of the current treeNode's children are visited.
+    return treeX1 > dataX2 || 
+           treeX2 < dataX1 || 
+           treeY1 > dataY2 || 
+           treeY2 < dataY1;
+  };
 }

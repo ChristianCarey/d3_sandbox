@@ -120,7 +120,9 @@ var tick = function tick() {
       .attr('y2', function(d) { return d.target.y; })
 
   // Adjust the transform:translate property on each node to match its data's x and y coordinates (which are created by the force function).
-  node.attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ")"; });
+  node.attr('transform', function(d) { 
+    return 'translate(' + d.x + ',' + d.y + ')';
+  });
 }
 
 var expand = function expand(d) {
